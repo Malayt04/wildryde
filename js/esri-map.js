@@ -139,19 +139,17 @@ require([
             if (pinGraphic) {
                 view.graphics.remove(pinGraphic); // Remove existing pin graphic
             }
-
+        
             pinGraphic = new Graphic({
                 symbol: pinSymbol,
                 geometry: wrMap.selectedPoint
             });
-
-            view.graphics.add(pinGraphic); 
-
-            wrMap.dispatchEvent('pickupChange');
-            
-            console.log("Pickup change event dispatched");
-        });
         
+            view.graphics.add(pinGraphic); // Add new pin graphic
+        
+            // Dispatch custom event
+            wrMap.dispatchEvent('pickupChange'); // Ensure this line is executed
+        });
     }).catch(err => {
         console.error("Error loading the map view:", err);
     });

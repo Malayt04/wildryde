@@ -81,6 +81,9 @@ WildRydes.map = WildRydes.map || {};
         var requestButton = $('#request');
         requestButton.text('Request Unicorn'); // Change button text
         requestButton.prop('disabled', false); // Enable button when pickup is set
+    
+        // Optional: Log to confirm this function is called
+        console.log("Pickup changed! Button enabled.");
     }
 
     function handleRequestClick(event) {
