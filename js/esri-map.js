@@ -10,8 +10,8 @@ require(["esri/Map", "esri/views/MapView"], (Map, MapView) => {
     const view = new MapView({
       container: "map", 
       map: map, 
-      zoom: 12, 
-      center: [-122.31, 47.60]
+      zoom: 14, 
+      center: [79.14, 12.93]
     });
 
     const pinSymbol = new TextSymbol({
