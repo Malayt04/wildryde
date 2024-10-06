@@ -8,7 +8,7 @@ require([
     'esri/symbols/TextSymbol',
     'esri/symbols/PictureMarkerSymbol',
     'esri/geometry/support/webMercatorUtils',
-    ], (Map, MapView) => {
+    ], (Map, MapView, Graphic, Point, TextSymbol, webMercatorUtils) => {
 
     var wrMap = WildRydes.map;
 
@@ -32,7 +32,8 @@ require([
     });
 
     var unicornSymbol = new PictureMarkerSymbol({
-        url: 'images/unicorn-icon.png',
+        type: "picture-marker",
+        url: 'https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png',
         width: '25px',
         height: '25px'
     });
