@@ -1,6 +1,14 @@
 var WildRydes = window.WildRydes || {};
 
-require(["esri/Map", "esri/views/MapView"], (Map, MapView) => {
+require([
+    "esri/Map",
+     "esri/views/MapView",
+    'esri/Graphic',
+    'esri/geometry/Point',
+    'esri/symbols/TextSymbol',
+    'esri/symbols/PictureMarkerSymbol',
+    'esri/geometry/support/webMercatorUtils',
+    ], (Map, MapView) => {
 
     var wrMap = WildRydes.map;
 
