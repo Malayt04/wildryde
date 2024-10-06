@@ -15,6 +15,7 @@ WildRydes.map = WildRydes.map || {};
         alert(error);
         window.location.href = '/signin.html';
     });
+
     function requestUnicorn(pickupLocation) {
         $.ajax({
             method: 'POST',
@@ -33,7 +34,7 @@ WildRydes.map = WildRydes.map || {};
             error: function ajaxError(jqXHR, textStatus, errorThrown) {
                 console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
                 console.error('Response: ', jqXHR.responseText);
-                alert('An error occured when requesting your unicorn:\n' + jqXHR.responseText);
+                alert('An error occurred when requesting your unicorn:\n' + jqXHR.responseText);
             }
         });
     }
@@ -48,7 +49,7 @@ WildRydes.map = WildRydes.map || {};
         animateArrival(function animateCallback() {
             displayUpdate(unicorn.Name + ' has arrived. Giddy up!');
             WildRydes.map.unsetLocation();
-            $('#request').prop('disabled', 'disabled');
+            $('#request').prop('disabled', true); // Disable button after request
             $('#request').text('Set Pickup');
         });
     }
@@ -61,6 +62,7 @@ WildRydes.map = WildRydes.map || {};
             alert("You have been signed out.");
             window.location = "signin.html";
         });
+        
         $(WildRydes.map).on('pickupChange', handlePickupChanged);
 
         WildRydes.authToken.then(function updateAuthMessage(token) {
@@ -77,14 +79,19 @@ WildRydes.map = WildRydes.map || {};
 
     function handlePickupChanged() {
         var requestButton = $('#request');
-        requestButton.text('Request Unicorn');
-        requestButton.prop('disabled', false);
+        requestButton.text('Request Unicorn'); // Change button text
+        requestButton.prop('disabled', false); // Enable button when pickup is set
     }
 
     function handleRequestClick(event) {
         var pickupLocation = WildRydes.map.selectedPoint;
         event.preventDefault();
-        requestUnicorn(pickupLocation);
+        
+        if (pickupLocation) { // Ensure a valid pickup location
+            requestUnicorn(pickupLocation); // Send data to rides API
+        } else {
+            alert("Please select a pickup location on the map.");
+        }
     }
 
     function animateArrival(callback) {
