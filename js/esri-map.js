@@ -52,7 +52,7 @@ require([
 
     var unicornSymbol = {
         type: "picture-marker", 
-        url: "images/unicorn-icon.png",
+        url: "images/taxi.png",
         width: "64px",
         height: "64px"
     };
