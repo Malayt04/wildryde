@@ -11,146 +11,166 @@ require([
     "esri/symbols/PictureMarkerSymbol",
     "esri/geometry/support/webMercatorUtils"
 ], (Map, MapView, Graphic, Point, TextSymbol, PictureMarkerSymbol, webMercatorUtils) => {
-
-    var wrMap = WildRydes.map; // Reference to the initialized map object
-
-    // Custom event handling
-    wrMap.events = {};
-
-    wrMap.dispatchEvent = function(eventName) {
+    
+    // Custom event handling setup
+    WildRydes.map.events = {};
+    WildRydes.map.dispatchEvent = function(eventName) {
         if (this.events[eventName]) {
             this.events[eventName].forEach(callback => callback());
         }
     };
-
-    wrMap.on = function(eventName, callback) {
+    WildRydes.map.on = function(eventName, callback) {
         if (!this.events[eventName]) {
             this.events[eventName] = [];
         }
         this.events[eventName].push(callback);
     };
 
-    const map = new Map({
-        basemap: "gray-vector"
-    });
+    // Use navigator.geolocation to get user location and initialize map
+    function initMapWithLocation(latitude, longitude) {
+        const map = new Map({ basemap: "gray-vector" });
 
-    const view = new MapView({
-        container: "map", 
-        map: map, 
-        zoom: 14, 
-        center: [79.14, 12.93]
-    });
+        const view = new MapView({
+            container: "map",
+            map: map,
+            zoom: 14,
+            center: [longitude, latitude]
+        });
 
-    const pinSymbol = new TextSymbol({
-        color: '#f50856',
-        text: '\ue61d',
-        font: {
-            size: 20,
-            family: 'CalciteWebCoreIcons'
+        const pinSymbol = new TextSymbol({
+            color: '#f50856',
+            text: '\ue61d',
+            font: {
+                size: 20,
+                family: 'CalciteWebCoreIcons'
+            }
+        });
+
+        var unicornSymbol = {
+            type: "picture-marker",
+            url: "images/taxi.png",
+            width: "64px",
+            height: "64px"
+        };
+
+        var originalLocationGraphic, pinGraphic, unicornGraphic;
+
+        function updateCenter(newValue) {
+            WildRydes.map.center = {
+                latitude: newValue.latitude,
+                longitude: newValue.longitude
+            };
         }
-    });
 
-    var unicornSymbol = {
-        type: "picture-marker", 
-        url: "images/taxi.png",
-        width: "64px",
-        height: "64px"
-    };
+        function updateExtent(newValue) {
+            var min = webMercatorUtils.xyToLngLat(newValue.xmin, newValue.ymin);
+            var max = webMercatorUtils.xyToLngLat(newValue.xmax, newValue.ymax);
+            WildRydes.map.extent = {
+                minLng: min[0],
+                minLat: min[1],
+                maxLng: max[0],
+                maxLat: max[1]
+            };
+        }
 
-    var pinGraphic;
-    var unicornGraphic;
+        view.watch('extent', updateExtent);
+        view.watch('center', updateCenter);
 
-    function updateCenter(newValue) {
-        wrMap.center = {
-            latitude: newValue.latitude,
-            longitude: newValue.longitude
-        };
-    }
+        view.when(() => {
+            updateExtent(view.extent);
+            updateCenter(view.center);
 
-    function updateExtent(newValue) {
-        var min = webMercatorUtils.xyToLngLat(newValue.xmin, newValue.ymin);
-        var max = webMercatorUtils.xyToLngLat(newValue.xmax, newValue.ymax);
-        wrMap.extent = {
-            minLng: min[0],
-            minLat: min[1],
-            maxLng: max[0],
-            maxLat: max[1]
-        };
-    }
+            // Animation function for movement
+            WildRydes.map.animate = function animate(origin, dest, callback) {
+                let startTime;
+                const step = function animateFrame(timestamp) {
+                    let progress, progressPct, point, deltaLat, deltaLon;
+                    if (!startTime) startTime = timestamp;
+                    progress = timestamp - startTime;
+                    progressPct = Math.min(progress / 2000, 1); // Duration of 2 seconds
 
-    view.watch('extent', updateExtent);
-    view.watch('center', updateCenter);
+                    deltaLat = (dest.latitude - origin.latitude) * progressPct;
+                    deltaLon = (dest.longitude - origin.longitude) * progressPct;
 
-    view.when(() => {
-        updateExtent(view.extent);
-        updateCenter(view.center);
+                    point = new Point({
+                        longitude: origin.longitude + deltaLon,
+                        latitude: origin.latitude + deltaLat
+                    });
 
-        // Initialize the animate function
-        wrMap.animate = function animate(origin, dest, callback) {
-            let startTime;
-            const step = function animateFrame(timestamp) {
-                let progress;
-                let progressPct;
-                let point;
-                let deltaLat;
-                let deltaLon;
+                    if (unicornGraphic) {
+                        view.graphics.remove(unicornGraphic); // Remove previous graphic
+                    }
 
-                if (!startTime) startTime = timestamp;
-                progress = timestamp - startTime;
-                progressPct = Math.min(progress / 2000, 1); // Duration of 2 seconds
+                    unicornGraphic = new Graphic({
+                        geometry: point,
+                        symbol: unicornSymbol
+                    });
 
-                deltaLat = (dest.latitude - origin.latitude) * progressPct;
-                deltaLon = (dest.longitude - origin.longitude) * progressPct;
+                    view.graphics.add(unicornGraphic); // Add updated graphic
 
-                point = new Point({
-                    longitude: origin.longitude + deltaLon,
-                    latitude: origin.latitude + deltaLat
-                });
+                    if (progressPct < 1) {
+                        requestAnimationFrame(step); // Continue animation
+                    } else {
+                        callback(); // Call the callback when done
+                    }
+                };
 
-                if (unicornGraphic) {
-                    view.graphics.remove(unicornGraphic); // Remove previous graphic
-                }
+                requestAnimationFrame(step); // Start the animation
+            };
 
-                unicornGraphic = new Graphic({
-                    geometry: point,
-                    symbol: unicornSymbol
-                });
-
-                view.graphics.add(unicornGraphic); // Add updated graphic
-
-                if (progressPct < 1) {
-                    requestAnimationFrame(step); // Continue animation
-                } else {
-                    callback(); // Call the callback when done
+            WildRydes.map.unsetLocation = function unsetLocation() {
+                if (pinGraphic) {
+                    view.graphics.remove(pinGraphic); // Remove pin graphic if it exists
                 }
             };
 
-            requestAnimationFrame(step); // Start the animation
-        };
-
-        wrMap.unsetLocation = function unsetLocation() {
-            if (pinGraphic) {
-                view.graphics.remove(pinGraphic); // Remove pin graphic if it exists
-            }
-        };
-
-        view.on('click', function handleViewClick(event) {
-            wrMap.selectedPoint = event.mapPoint; // Store selected point
-            if (pinGraphic) {
-                view.graphics.remove(pinGraphic); // Remove existing pin graphic
-            }
-        
-            pinGraphic = new Graphic({
-                symbol: pinSymbol,
-                geometry: wrMap.selectedPoint
+            view.on('click', function handleViewClick(event) {
+                WildRydes.map.selectedPoint = event.mapPoint; // Store selected point
+                if (pinGraphic) {
+                    view.graphics.remove(pinGraphic); // Remove existing pin graphic
+                }
+            
+                pinGraphic = new Graphic({
+                    symbol: pinSymbol,
+                    geometry: WildRydes.map.selectedPoint
+                });
+            
+                view.graphics.add(pinGraphic); // Add new pin graphic
+                WildRydes.map.dispatchEvent('pickupChange'); // Dispatch custom event
             });
-        
-            view.graphics.add(pinGraphic); // Add new pin graphic
-        
-            // Dispatch custom event
-            wrMap.dispatchEvent('pickupChange'); // Ensure this line is executed
+        }).catch(err => {
+            console.error("Error loading the map view:", err);
         });
-    }).catch(err => {
-        console.error("Error loading the map view:", err);
-    });
+
+        function markOriginalLocation() {
+            originalLocationGraphic = new Graphic({
+                symbol: pinSymbol,
+                geometry: new Point({
+                    longitude: longitude,
+                    latitude: latitude
+                })
+            });
+            view.graphics.add(originalLocationGraphic);
+        }
+
+        // Mark original location
+        markOriginalLocation();
+    }
+
+    // Get location and initialize map
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                initMapWithLocation(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                // Optionally: Initialize with default location if error
+                initMapWithLocation(0, 0); // Default to (0,0) or another fallback location
+            }
+        );
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+        initMapWithLocation(0, 0); // Default to (0,0) or another fallback location
+    }
 });
