@@ -1,6 +1,5 @@
 /*global WildRydes _config*/
 
-const {userLocation} = require('./currentLocation.js')
 var WildRydes = window.WildRydes || {};
 WildRydes.map = WildRydes.map || {}; // Ensure the map object is initialized
 
@@ -91,8 +90,8 @@ require([
                     progress = timestamp - startTime;
                     progressPct = Math.min(progress / 2000, 1); // Duration of 2 seconds
 
-                    deltaLat = (userLocation.latitude - origin.latitude) * progressPct;
-                    deltaLon = (userLocation.longitude - origin.longitude) * progressPct;
+                    deltaLat = (dest.latitude - origin.latitude) * progressPct;
+                    deltaLon = (dest.longitude - origin.longitude) * progressPct;
 
                     point = new Point({
                         longitude: origin.longitude + deltaLon,
