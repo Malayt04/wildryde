@@ -1,5 +1,5 @@
 /*global WildRydes _config*/
-const {userLocation} = require('./currentLocation.js')
+const userLocation = require('./currentLocation.js')
 var WildRydes = window.WildRydes || {};
 WildRydes.map = WildRydes.map || {};
 
@@ -47,7 +47,7 @@ WildRydes.map = WildRydes.map || {};
             displayUpdate(unicorn.Name + ' is arriving');
             displayUpdate(unicorn.Driver.Name + 'is your dirver')
             displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
-            displayUpdate('Your total charge is ' +  (userLocation.latitude - WildRydes.map.selectedPoint.latitude) * 1000);
+            displayUpdate('Your total charge is ' +  (userLocation.latitude - WildRydes.map.selectedPoint.latitude) * 1000)
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
