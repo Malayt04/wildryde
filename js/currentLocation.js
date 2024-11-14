@@ -16,9 +16,9 @@
     console.error("Geolocation is not supported by this browser.");
 }
 
-const location = {
+const userLocation = {
     latitude: latitude,
     longitude: longitude
 }
 
-export default location
+export default userLocation
