@@ -1,4 +1,6 @@
 /*global WildRydes _config*/
+
+const {location} = require('./currentLocation.js')
 var WildRydes = window.WildRydes || {};
 WildRydes.map = WildRydes.map || {}; // Ensure the map object is initialized
 
@@ -81,46 +83,40 @@ require([
             updateCenter(view.center);
 
             // Animation function for movement
-            WildRydes.map.animate = function animate(callback) {
+            WildRydes.map.animate = function animate(origin, dest, callback) {
                 let startTime;
                 const step = function animateFrame(timestamp) {
                     let progress, progressPct, point, deltaLat, deltaLon;
-                    
-                    // Get the current position (center of the map)
-                    const currentLocation = view.center;
-            
                     if (!startTime) startTime = timestamp;
                     progress = timestamp - startTime;
                     progressPct = Math.min(progress / 2000, 1); // Duration of 2 seconds
-            
-                    // Calculate movement (simulating movement between origin and current position)
-                    const origin = { latitude: 0, longitude: 0 }; // Starting point (can be customized)
-                    deltaLat = (currentLocation.latitude - origin.latitude) * progressPct;
-                    deltaLon = (currentLocation.longitude - origin.longitude) * progressPct;
-            
+
+                    deltaLat = (location.latitude - origin.latitude) * progressPct;
+                    deltaLon = (location.longitude - origin.longitude) * progressPct;
+
                     point = new Point({
                         longitude: origin.longitude + deltaLon,
                         latitude: origin.latitude + deltaLat
                     });
-            
+
                     if (unicornGraphic) {
                         view.graphics.remove(unicornGraphic); // Remove previous graphic
                     }
-            
+
                     unicornGraphic = new Graphic({
                         geometry: point,
                         symbol: unicornSymbol
                     });
-            
+
                     view.graphics.add(unicornGraphic); // Add updated graphic
-            
+
                     if (progressPct < 1) {
                         requestAnimationFrame(step); // Continue animation
                     } else {
                         callback(); // Call the callback when done
                     }
                 };
-            
+
                 requestAnimationFrame(step); // Start the animation
             };
 
