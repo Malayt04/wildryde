@@ -45,8 +45,8 @@ WildRydes.map = WildRydes.map || {};
         displayUpdate(unicorn.Name + ', your ' + unicorn.Color + ' taxi, is on its way.');
         animateArrival(function animateCallback() {
             displayUpdate(unicorn.Name + ' is arriving');
-            displayUpdate(unicorn.Driver + 'is your dirver')
-            displayUpdate('Contact him on ' + unicorn.PhoneNumber);
+            displayUpdate(unicorn.Driver.Name + 'is your dirver')
+            displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
