@@ -65,10 +65,11 @@ if (navigator.geolocation) {
         displayUpdate(unicorn.Name + ', your ' + unicorn.Color + ' taxi, is on its way.');
         animateArrival(function animateCallback() {
             displayUpdate(unicorn.Name + ' is arriving');
-            displayUpdate(unicorn.Driver.Name + 'is your dirver')
+            displayUpdate(unicorn.Driver.Name + ' is your dirver')
             displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
             console.log(WildRydes.map.selectedPoint.latitude);
             console.log(userLocation.latitude)
+            displayUpdate('Your total cost is  Rs '  + (WildRydes.map.selectedPoint.latitude - userLocation.latitude) * 100000);
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
