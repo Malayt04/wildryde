@@ -111,7 +111,7 @@ if (navigator.geolocation) {
     }
 
     function animateArrival(callback) {
-        var dest = WildRydes.map.selectedPoint;
+        var dest = userLocation;
         var origin = {};
 
         origin.latitude = dest.latitude > WildRydes.map.center.latitude ? 
