@@ -63,7 +63,10 @@ if (navigator.geolocation) {
     function completeRequest(result) {
         var unicorn = result.Unicorn;
         displayUpdate(unicorn.Name + ', your ' + unicorn.Color + ' taxi, is on its way.');
-        animateArrival(function animateCallback() {
+            animateDestination(function animateCallback(){
+                console.log("Location is set");
+            })
+            animateArrival(function animateCallback() {
             displayUpdate(unicorn.Name + ' is arriving');
             displayUpdate(unicorn.Driver.Name + ' is your dirver')
             displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
@@ -113,6 +116,22 @@ if (navigator.geolocation) {
     function animateArrival(callback) {
         var dest = userLocation;
         var origin = {};
+
+        origin.latitude = dest.latitude > WildRydes.map.center.latitude ? 
+                         WildRydes.map.extent.minLat : 
+                         WildRydes.map.extent.maxLat;
+
+        origin.longitude = dest.longitude > WildRydes.map.center.longitude ? 
+                          WildRydes.map.extent.minLng : 
+                          WildRydes.map.extent.maxLng;
+
+        WildRydes.map.animate(origin, dest, callback);
+    }
+
+    function animateDestination(callback){
+        var dest = WildRydes.map.selectedPoint;
+        var origin = {};
+        WildRydes.map.animate(origin, dest, callback);
 
         origin.latitude = dest.latitude > WildRydes.map.center.latitude ? 
                          WildRydes.map.extent.minLat : 
