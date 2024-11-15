@@ -1,8 +1,27 @@
-import userLocation from "./currentLocation";
 
 /*global WildRydes _config*/
 var WildRydes = window.WildRydes || {};
 WildRydes.map = WildRydes.map || {};
+
+let userLocation = {
+    latitude: null,
+    longitude: null
+};
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            userLocation.latitude = position.coords.latitude;
+            userLocation.longitude = position.coords.longitude;
+            console.log("User Location:", userLocation);
+        },
+        (error) => {
+            console.error("Error getting location:", error);
+        }
+    );
+} else {
+    console.error("Geolocation is not supported by this browser.");
+}
 
 (function rideScopeWrapper($) {
     var authToken;
