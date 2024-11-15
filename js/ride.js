@@ -1,3 +1,5 @@
+import userLocation from "./currentLocation";
+
 /*global WildRydes _config*/
 var WildRydes = window.WildRydes || {};
 WildRydes.map = WildRydes.map || {};
@@ -46,7 +48,8 @@ WildRydes.map = WildRydes.map || {};
             displayUpdate(unicorn.Name + ' is arriving');
             displayUpdate(unicorn.Driver.Name + 'is your dirver')
             displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
-            console.log(WildRydes.map.selectedPoint);
+            console.log(WildRydes.map.selectedPoint.latitude);
+            console.log(userLocation.latitude)
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
