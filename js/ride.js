@@ -61,23 +61,29 @@ if (navigator.geolocation) {
     }
 
     function completeRequest(result) {
-        var unicorn = result.Unicorn;
-        displayUpdate(unicorn.Name + ', your ' + unicorn.Color + ' taxi, is on its way.');
-            animateDestination(function animateCallback(){
-                console.log("Location is set");
-            })
-            animateArrival(function animateCallback() {
-            displayUpdate(unicorn.Name + ' is arriving');
-            displayUpdate(unicorn.Driver.Name + ' is your dirver')
-            displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
+        var car = result.Car;
+        displayUpdate(car.Name + ', your ' + car.Color + ' taxi, is on its way.');
+        
+        animateDestination(function animateCallback() {
+            console.log("Location is set");
+        });
+        
+        animateArrival(function animateCallback() {
+            displayUpdate(car.Name + ' is arriving');
+            displayUpdate(car.Driver.Name + ' is your driver');
+            displayUpdate('Contact them on ' + car.Driver.PhoneNumber);
+            
             console.log(WildRydes.map.selectedPoint.latitude);
-            console.log(userLocation.latitude)
-            displayUpdate('Your total cost is  Rs '  + Math.abs(Math.round((WildRydes.map.selectedPoint.latitude - userLocation.latitude) *  100000)));
+            console.log(userLocation.latitude);
+            
+            displayUpdate('Your total cost is Rs ' + Math.abs(Math.round((WildRydes.map.selectedPoint.latitude - userLocation.latitude) * 100000)));
+            
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
         });
     }
+    
 
     $(function onDocReady() {
         $('#request').click(handleRequestClick);
