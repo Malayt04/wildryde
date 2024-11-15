@@ -69,7 +69,7 @@ if (navigator.geolocation) {
             displayUpdate('Contact him on ' + unicorn.Driver.PhoneNumber);
             console.log(WildRydes.map.selectedPoint.latitude);
             console.log(userLocation.latitude)
-            displayUpdate('Your total cost is  Rs '  + (WildRydes.map.selectedPoint.latitude - userLocation.latitude) * 100000);
+            displayUpdate('Your total cost is  Rs '  + Math.abs(Math.round(WildRydes.map.selectedPoint.latitude - userLocation.latitude)) * 100000);
             WildRydes.map.unsetLocation();
             $('#request').prop('disabled', true);
             $('#request').text('Set Pickup');
